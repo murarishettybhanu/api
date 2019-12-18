@@ -23,13 +23,19 @@ const UserSchema = new mongoose.Schema({
     required: true,
     minlength: 3,
     maxlength: 255
+  },
+  role: {
+    type: String,
+    required: true,
+    minlength: 3,
+    maxlength: 255
   }
 });
 
 
 //custom method to generate authToken 
 UserSchema.methods.generateAuthToken = function() { 
-  const token = jwt.sign({ _id: this._id}, config.get('myprivatekey')); //get the private key from the config file -> environment variable
+  const token = jwt.sign({ _id: this._id,role: this.role}, config.get('myprivatekey')); //get the private key from the config file -> environment variable
   return token;
 }
 
@@ -40,7 +46,8 @@ function validateUser(user) {
   const schema = {
     name: Joi.string().min(3).max(50).required(),
     email: Joi.string().min(5).max(255).required().email(),
-    password: Joi.string().min(3).max(255).required()
+    password: Joi.string().min(3).max(255).required(),
+    role: Joi.string().min(3).max(255).required()
   };
 
   return Joi.validate(user, schema);
